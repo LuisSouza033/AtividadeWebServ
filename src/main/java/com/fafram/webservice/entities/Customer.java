@@ -16,26 +16,36 @@ public class Customer {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String email;
     private String cpf;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "customer")
-    private List<Phone> phones;
 
-    public Customer(){
+    @OneToMany
+    @JoinTable(name = "tb_customer_phone", joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "phone_id"))
+    private Set<Phone> phones = new HashSet<>();
+
+
+    public Set<Phone> getPhones() {
+        return phones;
     }
-    public Customer(Long id, String name, String email, String cpf)
-    {
+
+    public void setPhones(Set<Phone> phones) {
+        this.phones = phones;
+    }
+
+    public Customer() {
+    }
+
+    public Customer(Long id, String name, String email, String cpf) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
     }
-    private List<Phone> phone = new ArrayList<>( );
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -72,15 +82,22 @@ public class Customer {
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return id.equals(customer.id);
+        return id.equals(customer.id) &&
+                name.equals(customer.name) &&
+                email.equals(customer.email) &&
+                cpf.equals(customer.cpf) &&
+                phones.equals(customer.phones);
     }
+
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, email, cpf, phones);
     }
+
 }
